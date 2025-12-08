@@ -1,81 +1,120 @@
+"""Main entry point for D&D Adventure game."""
+
 from dndgame.character import Character
-from dndgame.dice import roll
+from dndgame.enemy import Enemy
+from dndgame.combat import Combat
 
 
-def create_character():
+def get_valid_input(prompt: str, valid_options: list[str]) -> str:
+    """Get validated input from user."""
+    while True:
+        user_input = input(prompt).strip()
+        if user_input in valid_options:
+            return user_input
+        print(f"Invalid. Choose from: {', '.join(valid_options)}")
+
+
+def get_non_empty_input(prompt: str) -> str:
+    """Get non-empty input from user."""
+    while True:
+        user_input = input(prompt).strip()
+        if user_input:
+            return user_input
+        print("Cannot be empty. Try again.")
+
+
+def create_character() -> Character:
+    """Guide user through character creation."""
     print("Welcome to D&D Adventure!")
-    name = input("Enter your character's name: ")
+    print("="*40)
+    
+    name = get_non_empty_input("\nEnter character name: ")
 
     print("\nChoose your race:")
-    print("1. Human (+1 to all stats)")
-    print("2. Elf (+2 DEX)")
-    print("3. Dwarf (+2 CON)")
-    race_choice = input("Enter choice (1-3): ")
-    print("\n")
-    race = ["Human", "Elf", "Dwarf"][int(race_choice) - 1]
+    races = Character.available_races
+    for i, race in enumerate(races, 1):
+        desc = Character.get_race_description(race)
+        print(f"{i}. {race} ({desc})")
+    
+    choice = get_valid_input(f"Enter choice (1-{len(races)}): ", 
+                             [str(i) for i in range(1, len(races) + 1)])
+    race = races[int(choice) - 1]
 
+    print(f"\nCreating {name} the {race}...\n")
+    
     character = Character(name, race, 10)
     character.roll_stats()
     character.apply_racial_bonuses()
+    
+    print("\nCharacter created!")
     return character
 
 
-def display_character(character):
-    print(f"\n{character.name} the {character.race}")
-    print("\nStats:")
+def display_character(character: Character) -> None:
+    """Display character information."""
+    print(f"\n{'='*40}")
+    print(f"{character.name} the {character.race}")
+    print(f"{'='*40}")
+    print(f"Level: {character.level}")
+    print(f"HP: {character.hp}/{character.max_hp}")
+    print(f"AC: {character.armor_class}")
+    
+    print("\nAbility Scores:")
     for stat, value in character.stats.items():
-        modifier = character.get_modifier(stat)
-        print(f"{stat}: {value} ({'+' if modifier >= 0 else ''}{modifier})")
-    print(f"\nHP: {character.hp}")
+        mod = character.get_modifier(stat)
+        print(f"  {stat}: {value:2d} ({'+' if mod >= 0 else ''}{mod})")
 
 
-def simple_combat(player):
-    print("\nA goblin appears!")
-    goblin_hp = 5
-
-    while goblin_hp > 0:
-        print(f"\nGoblin HP: {goblin_hp}")
-        print("\nYour turn!")
-        print("1. Attack")
-        print("2. Run away")
-        print()
-
-        choice = input("What do you do? ")
-        if choice == "1":
-            attack = roll(20, 1)
-            if attack >= 10:
-                damage = roll(4, 1)
-                goblin_hp -= damage
-                print(f"You hit for {damage} damage!")
-            else:
-                print("You missed!")
-        elif choice == "2":
-            return False
-
-    return True
+def combat_encounter(player: Character, enemy_type: str) -> bool:
+    """Run combat encounter. Returns True if player won."""
+    enemy = Enemy(enemy_type)
+    combat = Combat(player, enemy)
+    winner = combat.run_combat()
+    return winner == player
 
 
-def main():
+def main() -> None:
+    """Main game loop."""
     player = create_character()
+    display_character(player)
+    
+    game_running = True
+    while game_running and player.is_alive():
+        print("\n" + "="*40)
+        print("What would you like to do?")
+        print("="*40)
+        print("1. Fight a Goblin")
+        print("2. Fight an Orc")
+        print("3. View character")
+        print("4. Rest (restore HP)")
+        print("5. Quit")
 
-    while True:
-        print("\nWhat would you like to do?")
-        print("1. Fight a goblin")
-        print("2. View character")
-        print("3. Quit")
-
-        choice = input("Enter choice (1-3): ")
+        choice = get_valid_input("Enter choice (1-5): ", ["1", "2", "3", "4", "5"])
 
         if choice == "1":
-            victory = simple_combat(player)
-            if victory:
-                print("You defeated the goblin!")
-            else:
-                print("You ran away!")
+            if not combat_encounter(player, "Goblin"):
+                print("\nGame Over!")
+                game_running = False
+                
         elif choice == "2":
-            display_character(player)
+            if not combat_encounter(player, "Orc"):
+                print("\nGame Over!")
+                game_running = False
+                
         elif choice == "3":
-            break
+            display_character(player)
+            
+        elif choice == "4":
+            player.heal(player.max_hp)
+            print(f"\n{player.name} rests!")
+            print(f"HP: {player.hp}/{player.max_hp}")
+            
+        elif choice == "5":
+            print("\nThanks for playing!")
+            game_running = False
+
+    if game_running and player.is_alive():
+        print(f"\n{player.name} lives to adventure another day!")
 
 
 if __name__ == "__main__":
