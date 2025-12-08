@@ -1,36 +1,51 @@
+"""Character creation and management."""
+
+from typing import ClassVar
 from dndgame.dice import roll
+from dndgame.entity import Entity
 
 
-class Character:
-    def __init__(self, name, race, base_hp):
-        self.name = name
-        self.race = race
-        self.stats = {}
-        self.base_hp = base_hp
-        self.hp = 0
-        self.max_hp = 0
-        self.level = 1
-        self.armor_class = 10
+RACES: dict[str, dict[str, int]] = {
+    "Human": {"STR": 1, "DEX": 1, "CON": 1, "INT": 1, "WIS": 1, "CHA": 1},
+    "Elf": {"DEX": 2},
+    "Dwarf": {"CON": 2},
+    "Halfling": {"DEX": 2},
+    "Orc": {"STR": 2, "CON": 1},
+}
 
-    def get_modifier(self, stat):
-        """Calculate ability modifier."""
-        return (self.stats[stat] - 10) // 2
 
-    def roll_stats(self):
+class Character(Entity):
+    """Player character with race and stats."""
+    
+    available_races: ClassVar[list[str]] = list(RACES.keys())
+    
+    def __init__(self, name: str, race: str, base_hp: int) -> None:
+        if race not in RACES:
+            raise ValueError(f"Invalid race: {race}. Must be one of {self.available_races}")
+        
+        super().__init__(name=name, max_hp=base_hp, armor_class=10, level=1)
+        self.race: str = race
+        self.base_hp: int = base_hp
+
+    def roll_stats(self) -> None:
+        """Roll 3d6 for each ability score."""
         print("Rolling stats...\n")
-        stats = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
-        for stat in stats:
+        for stat in ["STR", "DEX", "CON", "INT", "WIS", "CHA"]:
             print(f"Rolling {stat}...")
             self.stats[stat] = roll(6, 3)
-
         self.max_hp = self.base_hp + self.get_modifier("CON")
         self.hp = self.max_hp
 
-    def apply_racial_bonuses(self):
-        if self.race == "Dwarf":
-            self.stats["CON"] += 2
-        elif self.race == "Elf":
-            self.stats["DEX"] += 2
-        elif self.race == "Human":
-            for stat in self.stats:
-                self.stats[stat] += 1
+    def apply_racial_bonuses(self) -> None:
+        """Apply racial stat bonuses."""
+        for stat, bonus in RACES[self.race].items():
+            self.stats[stat] += bonus
+        self.max_hp = self.base_hp + self.get_modifier("CON")
+        self.hp = self.max_hp
+
+    @classmethod
+    def get_race_description(cls, race: str) -> str:
+        """Get racial bonus description."""
+        if race not in RACES:
+            return "Unknown race"
+        return ", ".join(f"+{v} {s}" for s, v in RACES[race].items())
