@@ -1,10 +1,10 @@
 """Enemy creatures for combat."""
 
-from typing import ClassVar
+from typing import ClassVar, Any
 from dndgame.entity import Entity
 
 
-ENEMY_TEMPLATES: dict[str, dict[str, int | dict[str, int]]] = {
+ENEMY_TEMPLATES: dict[str, dict[str, Any]] = {
     "Goblin": {
         "hp": 7, "ac": 13, "level": 1,
         "stats": {"STR": 8, "DEX": 14, "CON": 10, "INT": 10, "WIS": 8, "CHA": 8}
