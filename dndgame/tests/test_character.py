@@ -5,7 +5,7 @@ from unittest.mock import patch
 from dndgame.character import Character
 
 
-def test_character_creation():
+def test_character_creation() -> None:
     """Test basic initialization."""
     char = Character("Test", "Human", 10)
     assert char.name == "Test"
@@ -13,13 +13,13 @@ def test_character_creation():
     assert char.level == 1
 
 
-def test_invalid_race():
+def test_invalid_race() -> None:
     """Test invalid race raises error."""
     with pytest.raises(ValueError):
         Character("Bad", "Alien", 10)
 
 
-def test_get_modifier():
+def test_get_modifier() -> None:
     """Test ability modifier calculation."""
     char = Character("Test", "Human", 10)
     char.stats["STR"] = 10
@@ -32,18 +32,18 @@ def test_get_modifier():
     assert char.get_modifier("STR") == -1
 
 
-def test_roll_stats():
+def test_roll_stats() -> None:
     """Test stat rolling."""
     char = Character("Test", "Human", 10)
-    with patch("dndgame.dice.roll", return_value=12):
+    with patch("dndgame.character.roll", return_value=12):
         char.roll_stats()
     
     for stat in ["STR", "DEX", "CON", "INT", "WIS", "CHA"]:
         assert char.stats[stat] == 12
-    assert char.max_hp == 11  # 10 + modifier(12)
+    assert char.max_hp == 11
 
 
-def test_racial_bonuses_human():
+def test_racial_bonuses_human() -> None:
     """Test Human bonuses."""
     char = Character("Test", "Human", 10)
     char.stats = {"STR": 10, "DEX": 10, "CON": 10, "INT": 10, "WIS": 10, "CHA": 10}
@@ -55,7 +55,7 @@ def test_racial_bonuses_human():
         assert stat == 11
 
 
-def test_racial_bonuses_elf():
+def test_racial_bonuses_elf() -> None:
     """Test Elf bonuses."""
     char = Character("Test", "Elf", 10)
     char.stats = {"STR": 10, "DEX": 10, "CON": 10, "INT": 10, "WIS": 10, "CHA": 10}
@@ -66,7 +66,7 @@ def test_racial_bonuses_elf():
     assert char.stats["DEX"] == 12
 
 
-def test_is_alive():
+def test_is_alive() -> None:
     """Test is_alive method."""
     char = Character("Test", "Human", 10)
     char.hp = 5
@@ -76,7 +76,7 @@ def test_is_alive():
     assert char.is_alive() is False
 
 
-def test_take_damage():
+def test_take_damage() -> None:
     """Test taking damage."""
     char = Character("Test", "Human", 10)
     char.hp = 10
@@ -87,7 +87,7 @@ def test_take_damage():
     assert char.hp == 0
 
 
-def test_heal():
+def test_heal() -> None:
     """Test healing."""
     char = Character("Test", "Human", 10)
     char.hp = 5
