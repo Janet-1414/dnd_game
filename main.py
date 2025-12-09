@@ -75,46 +75,52 @@ def combat_encounter(player: Character, enemy_type: str) -> bool:
 
 def main() -> None:
     """Main game loop."""
-    player = create_character()
-    display_character(player)
+    try:
+        player = create_character()
+        display_character(player)
+        
+        game_running = True
+        while game_running and player.is_alive():
+            print("\n" + "="*40)
+            print("What would you like to do?")
+            print("="*40)
+            print("1. Fight a Goblin")
+            print("2. Fight an Orc")
+            print("3. View character")
+            print("4. Rest (restore HP)")
+            print("5. Quit")
+
+            choice = get_valid_input("Enter choice (1-5): ", ["1", "2", "3", "4", "5"])
+
+            if choice == "1":
+                if not combat_encounter(player, "Goblin"):
+                    print("\nGame Over!")
+                    game_running = False
+                    
+            elif choice == "2":
+                if not combat_encounter(player, "Orc"):
+                    print("\nGame Over!")
+                    game_running = False
+                    
+            elif choice == "3":
+                display_character(player)
+                
+            elif choice == "4":
+                player.heal(player.max_hp)
+                print(f"\n{player.name} rests!")
+                print(f"HP: {player.hp}/{player.max_hp}")
+                
+            elif choice == "5":
+                print("\nThanks for playing!")
+                game_running = False
+
+        if game_running and player.is_alive():
+            print(f"\n{player.name} lives to adventure another day!")
     
-    game_running = True
-    while game_running and player.is_alive():
-        print("\n" + "="*40)
-        print("What would you like to do?")
-        print("="*40)
-        print("1. Fight a Goblin")
-        print("2. Fight an Orc")
-        print("3. View character")
-        print("4. Rest (restore HP)")
-        print("5. Quit")
-
-        choice = get_valid_input("Enter choice (1-5): ", ["1", "2", "3", "4", "5"])
-
-        if choice == "1":
-            if not combat_encounter(player, "Goblin"):
-                print("\nGame Over!")
-                game_running = False
-                
-        elif choice == "2":
-            if not combat_encounter(player, "Orc"):
-                print("\nGame Over!")
-                game_running = False
-                
-        elif choice == "3":
-            display_character(player)
-            
-        elif choice == "4":
-            player.heal(player.max_hp)
-            print(f"\n{player.name} rests!")
-            print(f"HP: {player.hp}/{player.max_hp}")
-            
-        elif choice == "5":
-            print("\nThanks for playing!")
-            game_running = False
-
-    if game_running and player.is_alive():
-        print(f"\n{player.name} lives to adventure another day!")
+    except KeyboardInterrupt:
+        print("\n\nGame interrupted. Thanks for playing!")
+    except EOFError:
+        print("\n\nInput ended. Exiting game.")
 
 
 if __name__ == "__main__":
