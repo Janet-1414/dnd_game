@@ -6,7 +6,7 @@ from dndgame.entity import Entity
 
 class Spell:
     """Magical spell with level and power."""
-    
+
     def __init__(self, name: str, level: int, school: str, spell_power: int) -> None:
         self.name: str = name
         self.level: int = level
@@ -20,7 +20,7 @@ class Spell:
 
 class SpellBook:
     """Container for managing spells."""
-    
+
     def __init__(self) -> None:
         self.spells: list[Spell] = []
 

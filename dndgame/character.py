@@ -16,13 +16,15 @@ RACES: dict[str, dict[str, int]] = {
 
 class Character(Entity):
     """Player character with race and stats."""
-    
+
     available_races: ClassVar[list[str]] = list(RACES.keys())
-    
+
     def __init__(self, name: str, race: str, base_hp: int) -> None:
         if race not in RACES:
-            raise ValueError(f"Invalid race: {race}. Must be one of {self.available_races}")
-        
+            raise ValueError(
+                f"Invalid race: {race}. Must be one of {self.available_races}"
+            )
+
         super().__init__(name=name, max_hp=base_hp, armor_class=10, level=1)
         self.race: str = race
         self.base_hp: int = base_hp

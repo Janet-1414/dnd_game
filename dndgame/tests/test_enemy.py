@@ -44,6 +44,6 @@ def test_enemy_alive() -> None:
     """Test enemy is_alive."""
     goblin = Enemy("Goblin")
     assert goblin.is_alive() is True
-    
+
     goblin.take_damage(100)
     assert goblin.is_alive() is False

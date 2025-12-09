@@ -24,10 +24,10 @@ def test_get_modifier() -> None:
     char = Character("Test", "Human", 10)
     char.stats["STR"] = 10
     assert char.get_modifier("STR") == 0
-    
+
     char.stats["STR"] = 16
     assert char.get_modifier("STR") == 3
-    
+
     char.stats["STR"] = 8
     assert char.get_modifier("STR") == -1
 
@@ -37,7 +37,7 @@ def test_roll_stats() -> None:
     char = Character("Test", "Human", 10)
     with patch("dndgame.character.roll", return_value=12):
         char.roll_stats()
-    
+
     for stat in ["STR", "DEX", "CON", "INT", "WIS", "CHA"]:
         assert char.stats[stat] == 12
     assert char.max_hp == 11
@@ -50,7 +50,7 @@ def test_racial_bonuses_human() -> None:
     char.max_hp = 10
     char.hp = 10
     char.apply_racial_bonuses()
-    
+
     for stat in char.stats.values():
         assert stat == 11
 
@@ -62,7 +62,7 @@ def test_racial_bonuses_elf() -> None:
     char.max_hp = 10
     char.hp = 10
     char.apply_racial_bonuses()
-    
+
     assert char.stats["DEX"] == 12
 
 
@@ -71,7 +71,7 @@ def test_is_alive() -> None:
     char = Character("Test", "Human", 10)
     char.hp = 5
     assert char.is_alive() is True
-    
+
     char.hp = 0
     assert char.is_alive() is False
 
@@ -82,7 +82,7 @@ def test_take_damage() -> None:
     char.hp = 10
     char.take_damage(3)
     assert char.hp == 7
-    
+
     char.take_damage(20)
     assert char.hp == 0
 
@@ -92,9 +92,9 @@ def test_heal() -> None:
     char = Character("Test", "Human", 10)
     char.hp = 5
     char.max_hp = 10
-    
+
     char.heal(3)
     assert char.hp == 8
-    
+
     char.heal(10)
     assert char.hp == 10

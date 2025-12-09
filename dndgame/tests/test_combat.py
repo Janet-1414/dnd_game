@@ -80,7 +80,7 @@ def test_combat_ends_when_defeated(combat: Combat, enemy: Enemy) -> None:
     """Test combat ends when enemy defeated."""
     combat.initiative_order = [combat.player, combat.enemy]
     enemy.hp = 1
-    
+
     with patch("dndgame.combat.roll", side_effect=[20, 10]):
         should_continue = combat.execute_round()
     assert should_continue is False
